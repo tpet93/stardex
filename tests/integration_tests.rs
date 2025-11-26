@@ -9,7 +9,7 @@ use std::io::{Read, Write};
 use std::process::{Command as StdCommand, Stdio};
 use std::thread;
 use tar::{Builder, EntryType, Header};
-use tempfile::NamedTempFile;
+use tempfile::{tempdir, NamedTempFile};
 use xxhash_rust::xxh3::Xxh3;
 use xxhash_rust::xxh64::Xxh64;
 
@@ -755,6 +755,71 @@ fn test_metadata_entries_not_hashed() {
     assert!(dir_json["hash_algo"].is_null());
     assert_eq!(file_json["hash_algo"], "blake3");
     assert!(!file_json["hash"].is_null());
+}
+
+#[test]
+fn test_volume_label_header_is_accepted() {
+    let tmpdir = match tempdir() {
+        Ok(dir) => dir,
+        Err(_) => return,
+    };
+    if std::fs::write(tmpdir.path().join("file.txt"), b"labelled").is_err() {
+        return;
+    }
+    let label = tmpdir
+        .path()
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("label");
+
+    let tar_output = match StdCommand::new("tar")
+        .arg("-c")
+        .arg(format!("--label={label}"))
+        .arg("-C")
+        .arg(tmpdir.path())
+        .arg(".")
+        .output()
+    {
+        Ok(out) => out,
+        Err(_) => return,
+    };
+    if !tar_output.status.success() {
+        return;
+    }
+
+    let assert = AssertCommand::new(env!("CARGO_BIN_EXE_stardex"))
+        .write_stdin(tar_output.stdout)
+        .assert()
+        .success();
+
+    let stdout = String::from_utf8(assert.get_output().stdout.clone()).unwrap();
+    let entries: Vec<Value> = stdout
+        .trim()
+        .split('\n')
+        .filter(|line| !line.is_empty())
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+
+    assert!(
+        entries.iter().any(|j| j["path"] == label),
+        "expected volume label entry"
+    );
+
+    let label_entry = entries.iter().find(|j| j["path"] == label).unwrap();
+    assert_eq!(label_entry["file_type"], "VolumeHeader");
+    assert_eq!(label_entry["size"], 0);
+    assert!(label_entry["hash"].is_null());
+
+    let file_entry = entries
+        .iter()
+        .find(|j| {
+            j["path"]
+                .as_str()
+                .map(|p| p.ends_with("file.txt"))
+                .unwrap_or(false)
+        })
+        .expect("expected file entry");
+    assert_eq!(file_entry["hash_algo"], "blake3");
 }
 
 #[test]

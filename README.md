@@ -88,6 +88,10 @@ run the benchmark script to see how fast stardex can go on your system:
 *   `--no-fail`: Drain stdin on error instead of exiting (prevents broken pipes).
 *   `--init-sql`: When using `--format sql`, emit the schema and wrap inserts in `BEGIN; ... COMMIT;` so you can pipe directly into `sqlite3 file.sqlite`.
 
+### TODO
+
+- [ ] Re-enable `stardex man` and shell completion generation once the publishing bugs around those assets are resolved. Contributions welcome!
+
 ## Behavior & Limits
 
 - Hashing is applied only to data-bearing entries (`Regular`, `GNUSparse`, `Continuous`). Metadata-only entries are still validated and emitted without hashes. `--algo none` disables hashing entirely but leaves all metadata intact.

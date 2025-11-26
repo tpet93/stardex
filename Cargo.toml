@@ -1,6 +1,6 @@
 [package]
 name = "stardex"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Tony peter"]
 description = "A zero-trust, streaming tar parser + per-file hasher for backup pipelines."

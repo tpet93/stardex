@@ -28,6 +28,7 @@ pub fn describe_file_type(entry_type: EntryType) -> String {
         EntryType::GNUSparse => "GNUSparse",
         EntryType::XGlobalHeader => "GlobalPaxHeader",
         EntryType::XHeader => "PaxHeader",
+        other if other.as_byte() == b'V' => "VolumeHeader",
         _ => "Other",
     }
     .to_string()
