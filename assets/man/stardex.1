@@ -1,0 +1,63 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH stardex 1  "stardex 0.1.0" 
+.SH NAME
+stardex \- A zero\-trust, streaming tar parser + per\-file hasher for backup pipelines.
+.SH SYNOPSIS
+\fBstardex\fR [\fB\-\-algo\fR] [\fB\-\-format\fR] [\fB\-\-buffer\-size\fR] [\fB\-\-no\-fail\fR] [\fB\-\-init\-sql\fR] [\fB\-\-global\-hash\fR] [\fB\-\-summary\-out\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] [\fIsubcommands\fR]
+.SH DESCRIPTION
+A zero\-trust, streaming tar parser + per\-file hasher for backup pipelines.
+.SH OPTIONS
+.TP
+\fB\-\-algo\fR \fI<ALGO>\fR [default: blake3]
+Hashing algorithm to use
+.br
+
+.br
+[\fIpossible values: \fRsha256, blake3, md5, sha1, xxh64, xxh3, xxh128, none]
+.TP
+\fB\-\-format\fR \fI<FORMAT>\fR [default: jsonl]
+Output format
+.br
+
+.br
+[\fIpossible values: \fRjsonl, csv, sql]
+.TP
+\fB\-\-buffer\-size\fR \fI<BUFFER_SIZE>\fR [default: 2097152]
+Buffer size in bytes for reading file content (e.g. "64K", "1M")
+.TP
+\fB\-\-no\-fail\fR
+Prevent broken pipes by draining stdin on error
+.TP
+\fB\-\-init\-sql\fR
+Emit SQL schema and wrap inserts in BEGIN/COMMIT when using \-\-format sql
+.TP
+\fB\-\-global\-hash\fR \fI<GLOBAL_HASH>\fR
+Calculate a global hash for the entire tar stream
+.br
+
+.br
+[\fIpossible values: \fRsha256, blake3, md5, sha1, xxh64, xxh3, xxh128, none]
+.TP
+\fB\-\-summary\-out\fR \fI<SUMMARY_OUT>\fR
+Output path for the global summary (JSON)
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version
+.SH SUBCOMMANDS
+.TP
+stardex\-completions(1)
+Generate shell completions
+.TP
+stardex\-man(1)
+Generate man pages
+.TP
+stardex\-help(1)
+Print this message or the help of the given subcommand(s)
+.SH VERSION
+v0.1.0
+.SH AUTHORS
+Tony peter

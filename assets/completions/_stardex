@@ -1,0 +1,133 @@
+#compdef stardex
+
+autoload -U is-at-least
+
+_stardex() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" : \
+'--algo=[Hashing algorithm to use]:ALGO:(sha256 blake3 md5 sha1 xxh64 xxh3 xxh128 none)' \
+'--format=[Output format]:FORMAT:(jsonl csv sql)' \
+'--buffer-size=[Buffer size in bytes for reading file content (e.g. "64K", "1M")]:BUFFER_SIZE:_default' \
+'--global-hash=[Calculate a global hash for the entire tar stream]:GLOBAL_HASH:(sha256 blake3 md5 sha1 xxh64 xxh3 xxh128 none)' \
+'--summary-out=[Output path for the global summary (JSON)]:SUMMARY_OUT:_files' \
+'--no-fail[Prevent broken pipes by draining stdin on error]' \
+'--init-sql[Emit SQL schema and wrap inserts in BEGIN/COMMIT when using --format sql]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+":: :_stardex_commands" \
+"*::: :->stardex" \
+&& ret=0
+    case $state in
+    (stardex)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:stardex-command-$line[1]:"
+        case $line[1] in
+            (completions)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+':shell:(bash elvish fish powershell zsh)' \
+&& ret=0
+;;
+(man)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'::out_dir -- Output directory:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+":: :_stardex__help_commands" \
+"*::: :->help" \
+&& ret=0
+
+    case $state in
+    (help)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:stardex-help-command-$line[1]:"
+        case $line[1] in
+            (completions)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(man)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+        esac
+    ;;
+esac
+}
+
+(( $+functions[_stardex_commands] )) ||
+_stardex_commands() {
+    local commands; commands=(
+'completions:Generate shell completions' \
+'man:Generate man pages' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'stardex commands' commands "$@"
+}
+(( $+functions[_stardex__completions_commands] )) ||
+_stardex__completions_commands() {
+    local commands; commands=()
+    _describe -t commands 'stardex completions commands' commands "$@"
+}
+(( $+functions[_stardex__help_commands] )) ||
+_stardex__help_commands() {
+    local commands; commands=(
+'completions:Generate shell completions' \
+'man:Generate man pages' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'stardex help commands' commands "$@"
+}
+(( $+functions[_stardex__help__completions_commands] )) ||
+_stardex__help__completions_commands() {
+    local commands; commands=()
+    _describe -t commands 'stardex help completions commands' commands "$@"
+}
+(( $+functions[_stardex__help__help_commands] )) ||
+_stardex__help__help_commands() {
+    local commands; commands=()
+    _describe -t commands 'stardex help help commands' commands "$@"
+}
+(( $+functions[_stardex__help__man_commands] )) ||
+_stardex__help__man_commands() {
+    local commands; commands=()
+    _describe -t commands 'stardex help man commands' commands "$@"
+}
+(( $+functions[_stardex__man_commands] )) ||
+_stardex__man_commands() {
+    local commands; commands=()
+    _describe -t commands 'stardex man commands' commands "$@"
+}
+
+if [ "$funcstack[1]" = "_stardex" ]; then
+    _stardex "$@"
+else
+    compdef _stardex stardex
+fi
