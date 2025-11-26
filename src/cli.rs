@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::Parser;
 
 use crate::hash::HashAlgo;
 use crate::output::OutputFormat;
@@ -15,7 +15,7 @@ pub struct Cli {
     #[arg(long, value_enum, default_value_t = OutputFormat::Jsonl)]
     pub format: OutputFormat,
 
-    /// Buffer size in bytes for reading file content (e.g. "64K", "1M")
+    /// Buffer size in bytes for reading file content (e.g. "64K", "1M", "2M")
     #[arg(long, default_value_t = DEFAULT_BUFFER_SIZE, value_parser = parse_size)]
     pub buffer_size: usize,
 
@@ -34,35 +34,21 @@ pub struct Cli {
     /// Output path for the global summary (JSON)
     #[arg(long)]
     pub summary_out: Option<std::path::PathBuf>,
-
-    #[command(subcommand)]
-    pub command: Option<Commands>,
-}
-
-#[derive(Subcommand)]
-pub enum Commands {
-    /// Generate shell completions
-    Completions { shell: clap_complete::Shell },
-    /// Generate man pages
-    Man {
-        /// Output directory
-        #[arg(default_value = ".")]
-        out_dir: std::path::PathBuf,
-    },
 }
 
 fn parse_size(s: &str) -> Result<usize, String> {
-    let s = s.trim();
-    let (num, multiplier) =
-        if let Some(stripped) = s.strip_suffix(|c: char| c.eq_ignore_ascii_case(&'k')) {
-            (stripped, 1024)
-        } else if let Some(stripped) = s.strip_suffix(|c: char| c.eq_ignore_ascii_case(&'m')) {
-            (stripped, 1024 * 1024)
-        } else if let Some(stripped) = s.strip_suffix(|c: char| c.eq_ignore_ascii_case(&'g')) {
-            (stripped, 1024 * 1024 * 1024)
-        } else {
-            (s, 1)
-        };
+    let trimmed = s.trim();
+    let (num, multiplier) = if let Some(stripped) =
+        trimmed.strip_suffix(|c: char| c.eq_ignore_ascii_case(&'k'))
+    {
+        (stripped, 1024)
+    } else if let Some(stripped) = trimmed.strip_suffix(|c: char| c.eq_ignore_ascii_case(&'m')) {
+        (stripped, 1024 * 1024)
+    } else if let Some(stripped) = trimmed.strip_suffix(|c: char| c.eq_ignore_ascii_case(&'g')) {
+        (stripped, 1024 * 1024 * 1024)
+    } else {
+        (trimmed, 1)
+    };
 
     num.parse::<usize>()
         .map(|n| n * multiplier)

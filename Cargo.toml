@@ -1,6 +1,6 @@
 [package]
 name = "stardex"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Tony peter"]
 description = "A zero-trust, streaming tar parser + per-file hasher for backup pipelines."
@@ -16,8 +16,6 @@ categories = ["command-line-utilities", "compression"]
 anyhow = "1.0"
 blake3 = "1.8"
 clap = { version = "4.5", features = ["derive"] }
-clap_complete = "4.5"
-clap_mangen = "0.2"
 csv = "1.4"
 hex = "0.4"
 base64 = "0.22"
@@ -47,8 +45,8 @@ maintainer = "Tony peter <tpet93@github.com>"
 copyright = "2025, Tony peter"
 license-file = ["LICENSE", "4"]
 extended-description = """
-Stardex is a zero-trust, streaming tar parser and per-file hasher designed for backup pipelines.
-It reads tar streams from stdin, emits per-file metadata and hashes to stdout, and never modifies the stream.
+    Stardex is a zero-trust, streaming tar parser and per-file hasher designed for backup pipelines.
+    It reads tar streams from stdin, emits per-file metadata and hashes to stdout, and never modifies the stream.
 """
 depends = "$auto"
 section = "utils"
@@ -56,10 +54,7 @@ priority = "optional"
 assets = [
     ["target/release/stardex", "usr/bin/", "755"],
     ["README.md", "usr/share/doc/stardex/README.md", "644"],
-    ["assets/man/stardex.1", "usr/share/man/man1/stardex.1", "644"],
-    ["assets/completions/stardex.bash", "usr/share/bash-completion/completions/stardex", "644"],
-    ["assets/completions/_stardex", "usr/share/zsh/vendor-completions/_stardex", "644"],
-    ["assets/completions/stardex.fish", "usr/share/fish/vendor_completions.d/stardex.fish", "644"],
+    ["LICENSE", "usr/share/doc/stardex/LICENSE", "644"],
 ]
 
 [package.metadata.generate-rpm]
@@ -67,8 +62,4 @@ assets = [
     { source = "target/release/stardex", dest = "/usr/bin/stardex", mode = "755" },
     { source = "README.md", dest = "/usr/share/doc/stardex/README.md", mode = "644" },
     { source = "LICENSE", dest = "/usr/share/doc/stardex/LICENSE", mode = "644" },
-    { source = "assets/man/stardex.1", dest = "/usr/share/man/man1/stardex.1", mode = "644" },
-    { source = "assets/completions/stardex.bash", dest = "/usr/share/bash-completion/completions/stardex", mode = "644" },
-    { source = "assets/completions/_stardex", dest = "/usr/share/zsh/site-functions/_stardex", mode = "644" },
-    { source = "assets/completions/stardex.fish", dest = "/usr/share/fish/vendor_completions.d/stardex.fish", mode = "644" },
 ]

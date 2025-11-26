@@ -88,26 +88,6 @@ run the benchmark script to see how fast stardex can go on your system:
 *   `--no-fail`: Drain stdin on error instead of exiting (prevents broken pipes).
 *   `--init-sql`: When using `--format sql`, emit the schema and wrap inserts in `BEGIN; ... COMMIT;` so you can pipe directly into `sqlite3 file.sqlite`.
 
-### Generating Man Pages & Completions
-
-```bash
-# Generate Man Page (writes ./stardex.1 by default)
-stardex man --out-dir .
-
-# Generate Shell Completions (bash, zsh, fish, etc.)
-stardex completions zsh > _stardex
-```
-
-### Generating Man Pages & Completions
-
-```bash
-# Generate Man Page
-stardex man
-
-# Generate Shell Completions
-stardex completions zsh > _stardex
-```
-
 ## Behavior & Limits
 
 - Hashing is applied only to data-bearing entries (`Regular`, `GNUSparse`, `Continuous`). Metadata-only entries are still validated and emitted without hashes. `--algo none` disables hashing entirely but leaves all metadata intact.

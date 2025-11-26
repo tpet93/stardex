@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable buffer sizes (default: 256 KiB)
 - Non-UTF8 path handling via base64 encoding
 - Comprehensive test suite with 34 integration tests
-- Man page and shell completion generation
 
 ### Features
 - Zero-trust streaming design - never seeks, never modifies input
