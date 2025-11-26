@@ -1,0 +1,63 @@
+[package]
+name = "stardex"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tony peter"]
+description = "A zero-trust, streaming tar parser + per-file hasher for backup pipelines."
+license = "MIT"
+repository = "https://github.com/tpet93/stardex"
+homepage = "https://github.com/tpet93/stardex"
+documentation = "https://docs.rs/stardex"
+readme = "README.md"
+keywords = ["tar", "hash", "backup", "streaming", "checksum"]
+categories = ["command-line-utilities", "compression"]
+
+[dependencies]
+anyhow = "1.0"
+blake3 = "1.8"
+clap = { version = "4.5", features = ["derive"] }
+clap_complete = "4.5"
+clap_mangen = "0.2"
+csv = "1.4"
+hex = "0.4"
+base64 = "0.22"
+md-5 = "0.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha-1 = "0.10"
+sha2 = "0.10"
+tar = "0.4"
+xxhash-rust = { version = "0.8", features = ["xxh64", "xxh3"] }
+
+[dev-dependencies]
+assert_cmd = "2.1"
+predicates = "3.1"
+rand = "0.8"
+tempfile = "3.23"
+xxhash-rust = { version = "0.8", features = ["xxh64", "xxh3"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[package.metadata.deb]
+maintainer = "Tony peter <tpet93@github.com>"
+copyright = "2025, Tony peter"
+license-file = ["LICENSE", "4"]
+extended-description = """
+Stardex is a zero-trust, streaming tar parser and per-file hasher designed for backup pipelines.
+It reads tar streams from stdin, emits per-file metadata and hashes to stdout, and never modifies the stream.
+"""
+depends = "$auto"
+section = "utils"
+priority = "optional"
+assets = [
+    ["target/release/stardex", "usr/bin/", "755"],
+    ["README.md", "usr/share/doc/stardex/README.md", "644"],
+    ["assets/man/stardex.1", "usr/share/man/man1/stardex.1", "644"],
+    ["assets/completions/stardex.bash", "usr/share/bash-completion/completions/stardex", "644"],
+    ["assets/completions/_stardex", "usr/share/zsh/vendor-completions/_stardex", "644"],
+    ["assets/completions/stardex.fish", "usr/share/fish/vendor_completions.d/stardex.fish", "644"],
+]
