@@ -107,11 +107,11 @@ pub fn process_tar(cli: &Cli) -> Result<()> {
                 parse_numeric_field(|| header_view.size(), &header_block[SIZE_RANGE], entry_type)?;
             let mode =
                 parse_numeric_field(|| header_view.mode(), &header_block[MODE_RANGE], entry_type)?;
-            let mtime = parse_numeric_field(
+            let mtime: i64 = parse_numeric_field(
                 || header_view.mtime(),
                 &header_block[MTIME_RANGE],
                 entry_type,
-            )?;
+            )? as i64;
             let name_bytes = trim_tar_field(&header_block[NAME_RANGE]);
             let (path, path_is_utf8, path_raw_b64) = normalize_path(name_bytes);
 
@@ -205,7 +205,8 @@ fn process_entry<R: Read>(
 
     let size = parse_numeric_field(|| header.size(), &header_bytes[SIZE_RANGE], entry_type)?;
     let mode = parse_numeric_field(|| header.mode(), &header_bytes[MODE_RANGE], entry_type)?;
-    let mtime = parse_numeric_field(|| header.mtime(), &header_bytes[MTIME_RANGE], entry_type)?;
+    let mtime: i64 =
+        parse_numeric_field(|| header.mtime(), &header_bytes[MTIME_RANGE], entry_type)? as i64;
     let file_type = describe_file_type(entry_type);
 
     if matches!(entry_type, EntryType::XHeader | EntryType::XGlobalHeader) && size > pax_limit {
@@ -273,14 +274,10 @@ fn process_entry<R: Read>(
             final_size = parsed;
         }
         if let Some(pax_mtime) = pax_map.get("mtime") {
-            let seconds = pax_mtime
-                .split_once('.')
-                .map(|(s, _)| s)
-                .unwrap_or(pax_mtime.as_str());
-            let parsed = seconds
-                .parse::<u64>()
+            let parsed = pax_mtime
+                .parse::<f64>()
                 .map_err(|e| anyhow!("Invalid PAX mtime '{}': {}", pax_mtime, e))?;
-            final_mtime = parsed;
+            final_mtime = parsed as i64;
         }
         if let Some(pax_mode) = pax_map.get("mode") {
             let parsed = u32::from_str_radix(pax_mode, 8)

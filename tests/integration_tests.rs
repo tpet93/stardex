@@ -588,6 +588,43 @@ fn test_pax_overrides_path_size_and_mtime() {
 }
 
 #[test]
+fn test_pax_negative_mtime() {
+    // Simulate a Windows file with a pre-epoch mtime (1601-01-01 FILETIME epoch).
+    let mut payload = Vec::new();
+    payload.extend(pax_kv_record("mtime", "-11644473599.7538884"));
+
+    let mut ar = Builder::new(Vec::new());
+    let mut pax_header = Header::new_gnu();
+    pax_header.set_entry_type(EntryType::XHeader);
+    pax_header.set_size(payload.len() as u64);
+    pax_header.set_mode(0o644);
+    pax_header.set_cksum();
+    ar.append_data(&mut pax_header, "pax", &payload[..])
+        .unwrap();
+
+    let mut file_header = Header::new_gnu();
+    file_header.set_entry_type(EntryType::Regular);
+    file_header.set_size(5);
+    file_header.set_mode(0o644);
+    file_header.set_mtime(0);
+    file_header.set_cksum();
+    ar.append_data(&mut file_header, "old_file.txt", &b"hello"[..])
+        .unwrap();
+
+    ar.finish().unwrap();
+    let tar_data = ar.into_inner().unwrap();
+
+    let mut cmd = AssertCommand::new(env!("CARGO_BIN_EXE_stardex"));
+    let assert = cmd.write_stdin(tar_data).assert().success();
+    let output = assert.get_output();
+    let stdout = String::from_utf8(output.stdout.clone()).unwrap();
+    let json: Value = serde_json::from_str(&stdout.trim()).unwrap();
+
+    // f64 "-11644473599.7538884" truncated to i64 is -11644473599
+    assert_eq!(json["mtime"], -11644473599_i64);
+}
+
+#[test]
 fn test_pax_invalid_length_fails() {
     let payload = b"999 path=broken\n";
 

@@ -34,7 +34,7 @@ pub struct EntryMetadata {
     pub file_type: String,
     pub size: u64,
     pub mode: u32,
-    pub mtime: u64,
+    pub mtime: i64,
     pub hash_algo: Option<String>,
     pub hash: Option<String>,
     pub pax: Option<std::collections::BTreeMap<String, String>>,
